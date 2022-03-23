@@ -9,12 +9,21 @@ import {
   BALLOT_CONTRACT_ADDRESS,
 } from "../constants";
 import styles from "../styles/Home.module.css";
-import {parseName, parseBytes} from "../utils/index"
+import CheckVoterAddress from "./checkVoterAddress";
+import Proposals from "./proposal";
+import AddVoter from "./addVoter";
 
 export default function Home() {
   const [token, setToken] = useState();
   const [proposals, setProposals] = useState([]);
   const [chairperson, setChairperson] = useState('');
+  const [voterAddressToCheck, setVoterAddressToCheck] = useState('');
+  const [voterStatus, setVoterStatus] = useState();
+  const [checkAddressVoter, setCheckAddressVoter] = useState('');
+  const [newVoter, setNewVoter] = useState('');
+  const [newVoterStatus, setNewVoterStatus] = ('');
+
+
   async function _initialize() {
     await _intializeEthers();
   }
@@ -43,7 +52,17 @@ export default function Home() {
   };
   const voteProposal = async (proposal) => {
     await token.vote(proposal);
-   };
+  };
+  // It gives the right to vote to a new address
+	const addNewVoter = async () => {
+		try {
+			await token.giveRightToVote(newVoter);
+			setNewVoterStatus('Success');
+		} catch (err) {
+			console.log(err);
+			setNewVoterStatus('An error has occured');
+		}
+	};
 
   // Connects to the smart contract token id (check /contracts/contract-address.json)
   async function init() {
@@ -62,25 +81,20 @@ export default function Home() {
       <h1>Voting Smart Contract</h1>
       <div>
         <h4>chairperson: {chairperson}</h4>
-      </div>
-      <div>
-   <h4>proposal:</h4>
-   {proposals.map((proposal, index) => {
-    const name = parseName(parseBytes(proposal.name));
-    const voteCount = proposal.voteCount._hex;
-    return (
-     <div key={index} style={{ padding: '1rem 0' }}>
-      🗳 {name} - {Number(voteCount)}
-      <button
-       style={{ marginLeft: '2em' }}
-       onClick={() => voteProposal(index)}>
-       Vote
-      </button>
-     </div>
-    );
-   })}
-  </div>
-
+      </div>      
+      <Proposals proposals={proposals} voteProposal={voteProposal} />
+      <AddVoter
+				addNewVoter={addNewVoter}
+				setNewVoter={setNewVoter}
+				newVoter={newVoter}
+				newVoterStatus={newVoterStatus}
+			/>
+      <CheckVoterAddress
+        voterAddressToCheck = {voterAddressToCheck}
+        setVoterAddressToCheck = {setVoterAddressToCheck}
+        checkAddressVoter = {checkAddressVoter}
+        voterStatus = {voterStatus}
+        />
       <footer className={styles.footer}>
         Made with &#10084; by El Ducati
       </footer>
