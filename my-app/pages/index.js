@@ -18,10 +18,9 @@ export default function Home() {
   const [proposals, setProposals] = useState([]);
   const [chairperson, setChairperson] = useState('');
   const [voterAddressToCheck, setVoterAddressToCheck] = useState('');
-  const [voterStatus, setVoterStatus] = useState();
-  const [checkAddressVoter, setCheckAddressVoter] = useState('');
+  const [voterStatus, setVoterStatus] = useState();  
   const [newVoter, setNewVoter] = useState('');
-  const [newVoterStatus, setNewVoterStatus] = ('');
+  const [newVoterStatus, setNewVoterStatus] = useState('');
 
 
   async function _initialize() {
@@ -61,6 +60,17 @@ export default function Home() {
 		} catch (err) {
 			console.log(err);
 			setNewVoterStatus('An error has occured');
+		}
+	};
+
+  // Check if the address the user entered is a a voter or not
+	const checkAddressVoter = async () => {
+		try {
+			const voterData = await token.voters(`${voterAddressToCheck}`);
+			setVoterStatus(voterData);
+		} catch (err) {
+			console.log(err);
+			setVoterStatus('An error has occured');
 		}
 	};
 
